@@ -33,3 +33,4 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 train = "arrow_classification_model.train_main:main"
 predict = "arrow_classification_model.predict_main:main"
+camera = "arrow_classification_model.camera_main:main"
