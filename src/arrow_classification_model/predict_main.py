@@ -85,6 +85,26 @@ def iter_images(root: Path):
             yield p
 
 
+def infer_actual_label(img_path: Path) -> str | None:
+    """
+    Determine the ground-truth label from either the parent directory
+    (old layout) or the filename prefix (new flat layout: left#, right#, none#).
+    """
+    parent = img_path.parent.name.lower()
+    stem = img_path.stem.lower()
+
+    class_names = set(IDX_TO_CLASS.values())
+    if parent in class_names:
+        return parent
+
+    for name in class_names:
+        # accept stems like "left1", "left_arrow_02", "right-003"
+        prefix = name.split("_")[0] if "_" in name else name
+        if stem.startswith(prefix):
+            return name
+    return None
+
+
 def main():
     # project_root: .../arrow-classification-model/
     project_root = Path(__file__).resolve().parents[2]
@@ -126,9 +146,7 @@ def main():
         task = progress.add_task("Predicting", total=len(image_paths))
 
         for img_path in image_paths:
-            # Ground truth from immediate parent directory name
-            # e.g. predict/left_arrow/..., predict/right_arrow/..., predict/none/...
-            actual = img_path.parent.name
+            actual = infer_actual_label(img_path) or "unknown"
 
             pred_class, conf = predict_image(model, img_path, device)
             correct = pred_class == actual
