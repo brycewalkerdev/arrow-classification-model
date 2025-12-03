@@ -21,12 +21,12 @@ CLASS_TO_IDX = {
 
 @dataclass
 class TrainConfig:
-    epochs: int = 12
+    epochs: int = 30
     batch_size: int = 32
     val_ratio: float = 0.2
     lr: float = 3e-4
     weight_decay: float = 1e-4
-    num_workers: int = 0  # sandbox-friendly default; override via env if allowed
+    num_workers: int = 30
     seed: int = 42
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
     use_weighted_sampler: bool = False
@@ -234,7 +234,7 @@ def parse_weight_override(env_value: str | None) -> torch.Tensor | None:
 def main():
     project_root = Path(__file__).resolve().parents[2]
     config = TrainConfig(
-        epochs=get_env_int("TRAIN_EPOCHS", 12),
+        epochs=get_env_int("TRAIN_EPOCHS", 1000),
         batch_size=get_env_int("TRAIN_BATCH_SIZE", 32),
         num_workers=get_env_int("TRAIN_NUM_WORKERS", 0),
         lr=get_env_float("TRAIN_LR", 3e-4),
